@@ -143,11 +143,11 @@ type
 
    Jack_ringbuffer_data {.importc: "jack_ringbuffer_t", header: jackh.} = object
       buf: ptr char
-      len: csize
+      len: csize_t
 
    Jack_ringbuffer {.importc: "jack_ringbuffer_t", header: jackh.} = object
       buf: ptr char
-      write_ptr, read_ptr, size, size_mask: csize
+      write_ptr, read_ptr, size, size_mask: csize_t
       mlocked: int
 
    #TODO
@@ -292,7 +292,7 @@ proc jack_disconnect*(client: PJackClient,  source_port: cstring, destination_po
 proc jack_port_disconnect*(client: PJackClient, port: PJackPort): int {.importc: "jack_port_disconnect", header: jackh.}
 proc jack_port_name_size*(): int {.importc: "jack_port_name_size", header: jackh.}
 proc jack_port_type_size*(): int {.importc: "jack_port_type_size", header: jackh.}
-proc jack_port_type_get_buffer_size*(client: PJackClient, port_type: cstring): csize {.importc: "jack_port_type_get_buffer_size", header: jackh.}
+proc jack_port_type_get_buffer_size*(client: PJackClient, port_type: cstring): csize_t {.importc: "jack_port_type_get_buffer_size", header: jackh.}
 
 # Managing and determining latency
 
@@ -338,19 +338,19 @@ proc jack_internal_client_unload *(client: PJackClient, intclient: Jack_intclien
 
 # Ring Buffer
 
-proc jack_ringbuffer_create*(sz: csize): ptr Jack_ringbuffer {.importc: "jack_ringbuffer_create", header: jackh.}
+proc jack_ringbuffer_create*(sz: csize_t): ptr Jack_ringbuffer {.importc: "jack_ringbuffer_create", header: jackh.}
 proc jack_ringbuffer_free*(rb: Jack_ringbuffer) {.importc: "jack_ringbuffer_free", header: jackh.}
 proc jack_ringbuffer_get_read_vector*(rb: Jack_ringbuffer, vec: ptr Jack_ringbuffer_data) {.importc: "jack_ringbuffer_get_read_vector", header: jackh.}
 proc jack_ringbuffer_get_write_vector*(rb: Jack_ringbuffer, vec: ptr Jack_ringbuffer_data) {.importc: "jack_ringbuffer_get_write_vector", header: jackh.}
-proc jack_ringbuffer_read*(rb: Jack_ringbuffer, dest: cstring, cnt: csize): csize {.importc: "jack_ringbuffer_read", header: jackh.}
-proc jack_ringbuffer_peek*(rb: Jack_ringbuffer, dest: cstring, cnt: csize): csize {.importc: "jack_ringbuffer_peek", header: jackh.}
-proc jack_ringbuffer_read_advance*(rb: Jack_ringbuffer, cnt: csize) {.importc: "jack_ringbuffer_read_advance", header: jackh.}
-proc jack_ringbuffer_read_space*(rb: Jack_ringbuffer): csize {.importc: "jack_ringbuffer_read_space", header: jackh.}
+proc jack_ringbuffer_read*(rb: Jack_ringbuffer, dest: cstring, cnt: csize_t): csize_t {.importc: "jack_ringbuffer_read", header: jackh.}
+proc jack_ringbuffer_peek*(rb: Jack_ringbuffer, dest: cstring, cnt: csize_t): csize_t {.importc: "jack_ringbuffer_peek", header: jackh.}
+proc jack_ringbuffer_read_advance*(rb: Jack_ringbuffer, cnt: csize_t) {.importc: "jack_ringbuffer_read_advance", header: jackh.}
+proc jack_ringbuffer_read_space*(rb: Jack_ringbuffer): csize_t {.importc: "jack_ringbuffer_read_space", header: jackh.}
 proc jack_ringbuffer_mlock*(rb: Jack_ringbuffer): int {.importc: "jack_ringbuffer_mlock", header: jackh.}
 proc jack_ringbuffer_reset*(rb: Jack_ringbuffer) {.importc: "jack_ringbuffer_reset", header: jackh.}
-proc jack_ringbuffer_write*(rb: Jack_ringbuffer, src: cstring, cnt: csize): csize {.importc: "jack_ringbuffer_write", header: jackh.}
-proc jack_ringbuffer_write_advance*(rb: Jack_ringbuffer, cnt: csize) {.importc: "jack_ringbuffer_write_advance", header: jackh.}
-proc jack_ringbuffer_write_space*(rb: Jack_ringbuffer): csize {.importc: "jack_ringbuffer_write_space", header: jackh.}
+proc jack_ringbuffer_write*(rb: Jack_ringbuffer, src: cstring, cnt: csize_t): csize_t {.importc: "jack_ringbuffer_write", header: jackh.}
+proc jack_ringbuffer_write_advance*(rb: Jack_ringbuffer, cnt: csize_t) {.importc: "jack_ringbuffer_write_advance", header: jackh.}
+proc jack_ringbuffer_write_space*(rb: Jack_ringbuffer): csize_t {.importc: "jack_ringbuffer_write_space", header: jackh.}
 
 # Transport
 
@@ -383,9 +383,9 @@ proc jack_drop_real_time_scheduling *(thread: Jack_native_thread): int {.importc
 proc jack_midi_get_event_count*(port_buffer: pointer): Jack_nframes {.importc: "jack_midi_get_event_count", header: jackh.}
 proc jack_midi_event_get*(event: Jack_midi_event, port_buffer: pointer, event_index: uint32): int {.importc: "jack_midi_event_get ", header: jackh.}
 proc jack_midi_clear_buffer*(port_buffer: pointer) {.importc: "jack_midi_clear_buffer ", header: jackh.}
-proc jack_midi_max_event_size*(port_buffer: pointer): csize {.importc: "jack_midi_max_event_size ", header: jackh.}
-proc jack_midi_event_reserve*(port_buffer: pointer, time: Jack_nframes, data_size: csize): ptr JackMidiData {.importc: "jack_midi_event_reserve ", header: jackh.}
-proc jack_midi_event_write*(port_buffer: pointer, time: Jack_nframes, data: ptr Jack_midi_data, data_size: csize): int {.importc: "jack_midi_event_write ", header: jackh.}
+proc jack_midi_max_event_size*(port_buffer: pointer): csize_t {.importc: "jack_midi_max_event_size ", header: jackh.}
+proc jack_midi_event_reserve*(port_buffer: pointer, time: Jack_nframes, data_size: csize_t): ptr JackMidiData {.importc: "jack_midi_event_reserve ", header: jackh.}
+proc jack_midi_event_write*(port_buffer: pointer, time: Jack_nframes, data: ptr Jack_midi_data, data_size: csize_t): int {.importc: "jack_midi_event_write ", header: jackh.}
 proc jack_midi_get_lost_event_count*(port_buffer: pointer): uint32 {.importc: "jack_midi_get_lost_event_count ", header: jackh.}
 
 # Sessions
