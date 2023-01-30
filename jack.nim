@@ -31,9 +31,8 @@ type
    JackErrorCallback* = proc(msg: cstring) {.cdecl.}
    JackInfoCallback* = proc(msg: cstring) {.cdecl.}
 
-   Jack_intclient* = uint64
-   Jack_port_id* = uint64
-   Jack_port_type_id* = uint64
+   Jack_intclient* = Jack_uuid
+   Jack_port_id* = uint32
 
    JackOptions* = cint
    JackOptionsEnum* {.importc: "jack_options_t".} = enum
@@ -137,9 +136,9 @@ type
       padding7: int32
       unique_2: Jack_unique
 
-   JackSyncCallback {.importc: "jack_sync_callback_t", header: jackh.} = proc (state: Jack_transport_state, pos: ptr Jack_position, arg: pointer) 
+   JackSyncCallback {.importc, header: jackh.} = proc (state: Jack_transport_state, pos: ptr Jack_position, arg: pointer): cint
 
-   JackTimebaseCallback {.importc: "jack_timebase_callback_t", header: jackh.} = proc (state: Jack_transport_state, nframes: Jack_nframes, pos: ptr Jack_position, new_pos: cint, arg: pointer)
+   JackTimebaseCallback {.importc, header: jackh.} = proc (state: Jack_transport_state, nframes: Jack_nframes, pos: ptr Jack_position, new_pos: cint, arg: pointer)
 
    Jack_ringbuffer_data {.importc: "jack_ringbuffer_t", header: jackh.} = object
       buf: ptr char
@@ -165,7 +164,7 @@ type
       JackSessionSaveError = 0x01,
       JackSessionNeedTerminal = 0x02
 
-   JackSessionEvent* {.importc: "jack_sesion_event_t", header: jackh.} = object
+   JackSessionEvent* {.importc: "jack_session_event_t", header: jackh.} = object
       etype: JackSessionEventType
       session_dir, client_uuid, command_line: cstring
       flags: JackSessionFlags
@@ -210,11 +209,8 @@ type
       properties: ptr JackProperty
       property_size: uint32
 
-   JackPropertyChangeCallback {.importc.} = proc(subject: Jack_uuid, key: cstring, change: Jack_property_change, arg: pointer)
+   JackPropertyChangeCallback {.importc.} = proc(subject: Jack_uuid, key: cstring, change: Jack_property_change, arg: pointer) {.cdecl.}
 
-proc jack_get_version*(major_ptr: ptr cint, minor_ptr: ptr cint, micro_ptr: ptr cint, proto_ptr: ptr cint) {.importc: "jack_get_version", header: jackh.}
-
-proc jack_get_version_string*(): cstring {.importc: "jack_get_version_string", header: jackh.}
 
 # Creating & manipulating clients
 
@@ -226,7 +222,6 @@ proc jack_get_uuid_for_client_name*(client: PJackClient, client_name: cstring): 
 proc jack_get_client_name_by_uuid*(client: PJackClient, client_uuid: cstring): cstring {.importc: "jack_get_client_name_by_uuid", header: jackh.}
 proc jack_activate*(client: PJackClient): cint {.importc: "jack_activate", header: jackh.}
 proc jack_deactivate*(client: PJackClient): cint {.importc: "jack_deactivate", header: jackh.}
-proc jack_get_client_pid*(name: cstring): int {.importc: "jack_get_client_pid", header: jackh.}
 proc jack_client_thread_id*(client: PJackClient): JackNativeThread {.importc: "jack_client_thread_id", header: jackh.}
 proc jack_is_realtime*(client: PJackClient): cint {.importc: "jack_is_realtime", header: jackh.}
 
@@ -272,7 +267,6 @@ proc jack_port_name*(port: PJackPort): cstring {.importc: "jack_port_name", head
 proc jack_port_short_name*(port: PJackPort): cstring {.importc: "jack_port_short_name", header: jackh.}
 proc jack_port_flags*(port: PJackPort): cint {.importc: "jack_port_flags", header: jackh.}
 proc jack_port_type*(port: PJackPort): cstring {.importc: "jack_port_type", header: jackh.}
-proc jack_port_type_id*(port: PJackPort): Jack_port_type_id {.importc: "jack_port_type_id", header: jackh.}
 proc jack_port_is_mine*(client: PJackClient, port: PJackPort): cint {.importc: "jack_port_is_mine", header: jackh.}
 proc jack_port_connected*(port: PJackPort): cint {.importc: "jack_port_connected", header: jackh.}
 proc jack_port_connected_to*(port: PJackPort, port_name: cstring): cint {.importc: "jack_port_connected_to", header: jackh.}
@@ -402,8 +396,8 @@ proc jack_client_get_uuid *(client: PJackClient): cstring {.importc: "jack_clien
 #void 	jackctl_wait_signals *(sigset_t signals)
 
 type
-   JackOnDeviceAcquire* = proc(device_name: cstring)
-   JackOnDeviceRelease* = proc(device_name: cstring)
+   JackOnDeviceAcquire* = proc(device_name: cstring): bool {.cdecl.}
+   JackOnDeviceRelease* = proc(device_name: cstring) {.cdecl.}
 
 proc jackctl_server_create*(af: JackOnDeviceAcquire, rf: JackOnDeviceRelease): JackctlServer {.importc: "jackctl_server_create", header: jackh.}
 proc jackctl_server_destroy*(server: JackctlServer) {.importc: "jackctl_server_destroy", header: jackh.}
