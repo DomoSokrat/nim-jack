@@ -211,6 +211,9 @@ type
 
    JackPropertyChangeCallback {.importc.} = proc(subject: Jack_uuid, key: cstring, change: Jack_property_change, arg: pointer) {.cdecl.}
 
+# Ease of use
+func isNil*(client: PJackClient): bool {.borrow.}
+func isNil*(client: PJackPort): bool {.borrow.}
 
 # Creating & manipulating clients
 
@@ -270,8 +273,8 @@ proc jack_port_type*(port: PJackPort): cstring {.importc: "jack_port_type", head
 proc jack_port_is_mine*(client: PJackClient, port: PJackPort): cint {.importc: "jack_port_is_mine", header: jackh.}
 proc jack_port_connected*(port: PJackPort): cint {.importc: "jack_port_connected", header: jackh.}
 proc jack_port_connected_to*(port: PJackPort, port_name: cstring): cint {.importc: "jack_port_connected_to", header: jackh.}
-proc jack_port_get_connections*(port: PJackPort): ptr cstring {.importc: "jack_port_get_connections", header: jackh.}
-proc jack_port_get_all_connections*(client: PJackClient,  port: PJackPort): ptr cstring {.importc: "jack_port_get_all_connections", header: jackh.}
+proc jack_port_get_connections*(port: PJackPort): cstringArray {.importc: "jack_port_get_connections", header: jackh.}
+proc jack_port_get_all_connections*(client: PJackClient,  port: PJackPort): cstringArray {.importc: "jack_port_get_all_connections", header: jackh.}
 proc jack_port_set_name*(port: PJackPort, port_name: cstring): cint {.importc: "jack_port_set_name", header: jackh.}
 proc jack_port_set_alias*(port: PJackPort, alias: cstring): cint {.importc: "jack_port_set_alias", header: jackh.}
 proc jack_port_unset_alias*(port: PJackPort, alias: cstring): cint {.importc: "jack_port_unset_alias", header: jackh.}
@@ -296,7 +299,7 @@ proc jack_recompute_total_latencies*(client: PJackClient): cint {.importc: "jack
 
 # Looking up ports
 
-proc jack_get_ports*(client: PJackClient, port_name_pattern: cstring, type_name_pattern: cstring, flags: culong): ptr cstring {.importc: "jack_get_ports", header: jackh.}
+proc jack_get_ports*(client: PJackClient, port_name_pattern: cstring, type_name_pattern: cstring, flags: culong): cstringArray {.importc: "jack_get_ports", header: jackh.}
 proc jack_port_by_name*(client: PJackClient, port_name: cstring): PJackPort {.importc: "jack_port_by_name", header: jackh.}
 proc jack_port_by_id*(client: PJackClient, port_id: Jack_port_id): PJackPort {.importc: "jack_port_by_id", header: jackh.}
 
