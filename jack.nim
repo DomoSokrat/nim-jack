@@ -9,6 +9,7 @@
 
 const
    jackh = "<jack/jack.h>"
+   metadatah = "<jack/metadata.h>"
 
    JACK_DEFAULT_AUDIO_TYPE* = "32 bit float mono audio"
    JACK_DEFAULT_MIDI_TYPE* = "8 bit raw midi"
@@ -195,18 +196,18 @@ type
       JackParamString,
       JackParamBool
 
-   JackProperty* {.importc: "jack_property_t".} = object
-      key, data, typ: cstring
+   JackProperty* {.importc: "jack_property_t", header: metadatah.} = object
+      key*, data*, typ* {.importc: "type".}: cstring
 
-   JackPropertyChange* {.importc: "jack_property_change_t".} = enum
+   JackPropertyChange* {.importc: "jack_property_change_t", header: metadatah.} = enum
       PropertyCreated,
       PropertyChanged,
       PropertyDeleted
 
-   JackDescription {.importc: "jack_description_t".} = object
-      subject: JackUuid
-      property_count: uint32
-      properties: ptr JackProperty
+   JackDescription* {.importc: "jack_description_t", header: metadatah.} = object
+      subject*: JackUuid
+      property_cnt*: uint32
+      properties*: ptr UncheckedArray[JackProperty]
       property_size: uint32
 
    JackPropertyChangeCallback {.importc.} = proc(subject: JackUuid, key: cstring, change: JackPropertyChange, arg: pointer) {.cdecl.}
@@ -442,13 +443,13 @@ proc jack_log*(format: cstring) {.importc: "jack_log", header: jackh, varargs.}
 
 # Metadata API
 
-proc jack_set_property*(client: PJackClient, subject: JackUuid, key, value, typ: cstring): cint {.importc: "jack_set_property", header: jackh.}
-proc jack_get_property*(subject: JackUuid, key: cstring, value, typ: ptr cstring): cint {.importc: "jack_get_property", header: jackh.}
-proc jack_free_description*(desc: ptr JackDescription, free_description_itself: cint) {.importc: "jack_free_description", header: jackh.}
-proc jack_get_properties*(subject: JackUuid, desc: ptr JackDescription): cint {.importc: "jack_get_properties", header: jackh.}
-proc jack_get_all_properties*(descs: ptr ptr JackDescription): cint {.importc: "jack_get_all_properties", header: jackh.}
-proc jack_remove_property*(client: PJackClient, subject: JackUuid, key: cstring): cint {.importc: "jack_remove_property", header: jackh.}
-proc jack_remove_properties*(client: PJackClient, subject: JackUuid): cint {.importc: "jack_remove_properties", header: jackh.}
-proc jack_remove_all_properties*(client: PJackClient): cint {.importc: "jack_remove_all_properties", header: jackh.}
-proc jack_set_property_change_callback *(client: PJackClient, cb: JackPropertyChangeCallback, arg: pointer): cint {.importc: "jack_set_property_change_callback ", header: jackh.}
+proc jack_set_property*(client: PJackClient, subject: JackUuid, key, value, typ: cstring): cint {.importc: "jack_set_property", header: metadatah.}
+proc jack_get_property*(subject: JackUuid, key: cstring, value, typ: ptr cstring): cint {.importc: "jack_get_property", header: metadatah.}
+proc jack_free_description*(desc: ptr JackDescription, free_description_itself: cint) {.importc: "jack_free_description", header: metadatah.}
+proc jack_get_properties*(subject: JackUuid, desc: ptr JackDescription): cint {.importc: "jack_get_properties", header: metadatah.}
+proc jack_get_all_properties*(descs: ptr ptr UncheckedArray[JackDescription]): cint {.importc: "jack_get_all_properties", header: metadatah.}
+proc jack_remove_property*(client: PJackClient, subject: JackUuid, key: cstring): cint {.importc: "jack_remove_property", header: metadatah.}
+proc jack_remove_properties*(client: PJackClient, subject: JackUuid): cint {.importc: "jack_remove_properties", header: metadatah.}
+proc jack_remove_all_properties*(client: PJackClient): cint {.importc: "jack_remove_all_properties", header: metadatah.}
+proc jack_set_property_change_callback *(client: PJackClient, cb: JackPropertyChangeCallback, arg: pointer): cint {.importc: "jack_set_property_change_callback ", header: metadatah.}
 
